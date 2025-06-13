@@ -1,6 +1,7 @@
 from functions.run_python import run_python_file
 
 def main():
+    print("here")
     print(f"{run_python_file("calculator", "main.py")}")
     print(f"{run_python_file("calculator", "tests.py")}")
     print(f"{run_python_file("calculator", "../main.py")}")
