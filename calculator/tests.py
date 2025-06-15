@@ -44,6 +44,10 @@ class TestCalculator(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.calculator.evaluate("+ 3")
 
+    def test_division_by_zero(self):
+        with self.assertRaises(ValueError):
+            self.calculator.evaluate("10 / 0")
+
 
 if __name__ == "__main__":
     unittest.main()

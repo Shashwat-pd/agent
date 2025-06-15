@@ -33,40 +33,50 @@ def main():
     messages = [
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
+        
 
     generate_content(client, messages, verbose)
 
 
 def generate_content(client, messages, verbose):
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-001",
-        contents=messages,
-        config=types.GenerateContentConfig(
-            tools=[available_functions], system_instruction=system_prompt
-        ),
-    )
-    if verbose:
-        print("Prompt tokens:", response.usage_metadata.prompt_token_count)
-        print("Response tokens:", response.usage_metadata.candidates_token_count)
-
-    if not response.function_calls:
-
-        return response.text
-
-    for function_call_part in response.function_calls:
-        res = call_function(function_call_part)
-
-
-        try:
-            response_content = res.parts[0].function_response.response
-        except (AttributeError, IndexError):
-            raise RuntimeError("Fatal Error: Missing function response.")
-
-        
+    for _ in range(20):
+        response = client.models.generate_content(
+            model="gemini-2.0-flash-001",
+            contents=messages,
+            config=types.GenerateContentConfig(
+                tools=[available_functions], system_instruction=system_prompt
+            ),
+        )
         if verbose:
-            print(f"-> {res.parts[0].function_response.response}")
+            print("Prompt tokens:", response.usage_metadata.prompt_token_count)
+            print("Response tokens:", response.usage_metadata.candidates_token_count)
+
+        if not response.function_calls:
+            print(response.text)
+            return
         
-        print(f"{res.parts[0].function_response.response['result']}")
+        for condidate in response.candidates:
+            messages.append(condidate.content)
+
+        for function_call_part in response.function_calls:
+            res = call_function(function_call_part)
+
+
+            try:
+                response_content = res.parts[0].function_response.response
+            except (AttributeError, IndexError):
+                raise RuntimeError("Fatal Error: Missing function response.")
+            messages.append(res)
+
+            
+            if verbose:
+                print(f"-> {res.parts[0].function_response.response}")
+            
+            
+            #print(f"{res.parts[0].function_response.response['result']}")
+    print(response.text)
+
+    return 
 
 
 
