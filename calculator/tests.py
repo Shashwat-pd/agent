@@ -48,6 +48,14 @@ class TestCalculator(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.calculator.evaluate("10 / 0")
 
+    def test_log10(self):
+        result = self.calculator.evaluate("log10 100")
+        self.assertEqual(result, 2.0)
+
+    def test_ln(self):
+        result = self.calculator.evaluate("ln 2.71828")
+        self.assertAlmostEqual(result, 0.9999987284, places=5) # Use assertAlmostEqual for floating-point comparisons
+
 
 if __name__ == "__main__":
     unittest.main()

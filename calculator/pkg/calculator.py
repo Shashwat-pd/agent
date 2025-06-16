@@ -1,3 +1,5 @@
+import math
+
 class Calculator:
     def __init__(self):
         self.operators = {
@@ -5,12 +7,16 @@ class Calculator:
             "-": lambda a, b: a - b,
             "*": lambda a, b: a * b,
             "/": lambda a, b: a / b,
+            "log10": lambda a: math.log10(a),
+            "ln": lambda a: math.log(a),
         }
         self.precedence = {
             "+": 1,
             "-": 1,
             "*": 2,
             "/": 2,
+            "log10": 3,
+            "ln": 3,
         }
 
     def evaluate(self, expression):
@@ -51,11 +57,17 @@ class Calculator:
             return
 
         operator = operators.pop()
-        if len(values) < 2:
-            raise ValueError(f"not enough operands for operator {operator}")
+        if operator in ("log10", "ln"):
+            if len(values) < 1:
+                raise ValueError(f"not enough operands for operator {operator}")
+            a = values.pop()
+            values.append(self.operators[operator](a))
+        else:
+            if len(values) < 2:
+                raise ValueError(f"not enough operands for operator {operator}")
 
-        b = values.pop()
-        a = values.pop()
-        if operator == "/" and b == 0:
-            raise ValueError("division by zero")
-        values.append(self.operators[operator](a, b))
+            b = values.pop()
+            a = values.pop()
+            if operator == "/" and b == 0:
+                raise ValueError("division by zero")
+            values.append(self.operators[operator](a, b))
